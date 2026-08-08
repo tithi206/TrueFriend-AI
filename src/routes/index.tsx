@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Talk through anxious thoughts, track your mood, and keep private journal notes with an empathetic AI companion.",
+          "An empathetic AI companion for anxious moments and personal growth. Threaded conversations, mood check-ins, and a private journal in one calm space.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

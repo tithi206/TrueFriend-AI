@@ -78,14 +78,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Peace Companion" },
+      { title: "Peace Companion — A calm place to talk it through" },
       {
         name: "description",
-        content: "An empathetic AI companion for anxious moments and personal growth.",
+        content: "An empathetic AI companion for anxious moments and personal growth. Threaded conversations, mood check-ins, and a private journal in one calm space.",
       },
       { name: "author", content: "Peace Companion" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Peace Companion — A calm place to talk it through" },
+      { name: "twitter:title", content: "Peace Companion — A calm place to talk it through" },
+      { property: "og:description", content: "An empathetic AI companion for anxious moments and personal growth. Threaded conversations, mood check-ins, and a private journal in one calm space." },
+      { name: "twitter:description", content: "An empathetic AI companion for anxious moments and personal growth. Threaded conversations, mood check-ins, and a private journal in one calm space." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e53c6ef3a708cea3522e8f86f0b25b19/id-preview-4d67ab8f--c1fdcd07-34ce-4044-86a4-75da7d7e9a57.lovable.app-1786209682718.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e53c6ef3a708cea3522e8f86f0b25b19/id-preview-4d67ab8f--c1fdcd07-34ce-4044-86a4-75da7d7e9a57.lovable.app-1786209682718.png" },
     ],
     links: [
       {
