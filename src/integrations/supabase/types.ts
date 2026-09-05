@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_completions: {
+        Row: {
+          activity_type: string
+          completed_at: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       check_ins: {
         Row: {
           created_at: string
@@ -65,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          mood: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          mood?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          mood?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -102,19 +159,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           display_name: string | null
+          email: string | null
           id: string
+          updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
           id: string
+          updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
           id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reminder_settings: {
+        Row: {
+          activity_reminder: boolean
+          created_at: string
+          journal_reminder: boolean
+          mood_reminder: boolean
+          reminder_hour: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_reminder?: boolean
+          created_at?: string
+          journal_reminder?: boolean
+          mood_reminder?: boolean
+          reminder_hour?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_reminder?: boolean
+          created_at?: string
+          journal_reminder?: boolean
+          mood_reminder?: boolean
+          reminder_hour?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
