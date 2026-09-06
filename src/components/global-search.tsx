@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
-  CommandDialog,
+  Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -87,7 +88,9 @@ export function GlobalSearch() {
         <span className="hidden sm:inline">Search your space</span>
       </button>
 
-      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="overflow-hidden p-0">
+        <Command shouldFilter={false}>
         <CommandInput
           value={term}
           onValueChange={setTerm}
@@ -125,7 +128,7 @@ export function GlobalSearch() {
                   value={conversation.id}
                   onSelect={() => {
                     setOpen(false);
-                    navigate({ to: "/companion", search: { c: conversation.id } });
+                    navigate({ to: "/companion" });
                   }}
                 >
                   <span className="truncate">{conversation.title}</span>
@@ -152,7 +155,9 @@ export function GlobalSearch() {
             </CommandGroup>
           )}
         </CommandList>
-      </CommandDialog>
+        </Command>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
