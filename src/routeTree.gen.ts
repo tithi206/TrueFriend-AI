@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCheckInRouteImport } from './routes/_authenticated/check-in'
 import { Route as AuthenticatedCompanionRouteImport } from './routes/_authenticated/companion'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,6 +46,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
+  id: '/mood',
+  path: '/mood',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/check-in': typeof AuthenticatedCheckInRoute
   '/companion': typeof AuthenticatedCompanionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/mood': typeof AuthenticatedMoodRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/check-in': typeof AuthenticatedCheckInRoute
   '/companion': typeof AuthenticatedCompanionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/mood': typeof AuthenticatedMoodRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +76,13 @@ export interface FileRoutesById {
   '/_authenticated/check-in': typeof AuthenticatedCheckInRoute
   '/_authenticated/companion': typeof AuthenticatedCompanionRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/mood': typeof AuthenticatedMoodRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/check-in' | '/companion' | '/dashboard'
+  fullPaths: '/' | '/auth' | '/check-in' | '/companion' | '/dashboard' | '/mood'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/check-in' | '/companion' | '/dashboard'
+  to: '/' | '/auth' | '/check-in' | '/companion' | '/dashboard' | '/mood'
   id:
     | '__root__'
     | '/'
@@ -82,6 +91,7 @@ export interface FileRouteTypes {
     | '/_authenticated/check-in'
     | '/_authenticated/companion'
     | '/_authenticated/dashboard'
+    | '/_authenticated/mood'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mood': {
+      id: '/_authenticated/mood'
+      path: '/mood'
+      fullPath: '/mood'
+      preLoaderRoute: typeof AuthenticatedMoodRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -141,12 +158,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCheckInRoute: typeof AuthenticatedCheckInRoute
   AuthenticatedCompanionRoute: typeof AuthenticatedCompanionRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCheckInRoute: AuthenticatedCheckInRoute,
   AuthenticatedCompanionRoute: AuthenticatedCompanionRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMoodRoute: AuthenticatedMoodRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
