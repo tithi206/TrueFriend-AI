@@ -17,6 +17,7 @@ import { Route as AuthenticatedCompanionRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
+import { Route as AuthenticatedJournalEntryIdRouteImport } from './routes/_authenticated/journal.$entryId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,12 @@ const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
   path: '/mood',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedJournalEntryIdRoute =
+  AuthenticatedJournalEntryIdRouteImport.update({
+    id: '/$entryId',
+    path: '/$entryId',
+    getParentRoute: () => AuthenticatedJournalRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -64,8 +71,9 @@ export interface FileRoutesByFullPath {
   '/check-in': typeof AuthenticatedCheckInRoute
   '/companion': typeof AuthenticatedCompanionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/journal': typeof AuthenticatedJournalRoute
+  '/journal': typeof AuthenticatedJournalRouteWithChildren
   '/mood': typeof AuthenticatedMoodRoute
+  '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -73,8 +81,9 @@ export interface FileRoutesByTo {
   '/check-in': typeof AuthenticatedCheckInRoute
   '/companion': typeof AuthenticatedCompanionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/journal': typeof AuthenticatedJournalRoute
+  '/journal': typeof AuthenticatedJournalRouteWithChildren
   '/mood': typeof AuthenticatedMoodRoute
+  '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,8 +93,9 @@ export interface FileRoutesById {
   '/_authenticated/check-in': typeof AuthenticatedCheckInRoute
   '/_authenticated/companion': typeof AuthenticatedCompanionRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/journal': typeof AuthenticatedJournalRoute
+  '/_authenticated/journal': typeof AuthenticatedJournalRouteWithChildren
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
+  '/_authenticated/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/journal'
     | '/mood'
+    | '/journal/$entryId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/journal'
     | '/mood'
+    | '/journal/$entryId'
   id:
     | '__root__'
     | '/'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/journal'
     | '/_authenticated/mood'
+    | '/_authenticated/journal/$entryId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,14 +195,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoodRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/journal/$entryId': {
+      id: '/_authenticated/journal/$entryId'
+      path: '/$entryId'
+      fullPath: '/journal/$entryId'
+      preLoaderRoute: typeof AuthenticatedJournalEntryIdRouteImport
+      parentRoute: typeof AuthenticatedJournalRoute
+    }
   }
 }
+
+interface AuthenticatedJournalRouteChildren {
+  AuthenticatedJournalEntryIdRoute: typeof AuthenticatedJournalEntryIdRoute
+}
+
+const AuthenticatedJournalRouteChildren: AuthenticatedJournalRouteChildren = {
+  AuthenticatedJournalEntryIdRoute: AuthenticatedJournalEntryIdRoute,
+}
+
+const AuthenticatedJournalRouteWithChildren =
+  AuthenticatedJournalRoute._addFileChildren(AuthenticatedJournalRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCheckInRoute: typeof AuthenticatedCheckInRoute
   AuthenticatedCompanionRoute: typeof AuthenticatedCompanionRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
+  AuthenticatedJournalRoute: typeof AuthenticatedJournalRouteWithChildren
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
 }
 
@@ -197,7 +228,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCheckInRoute: AuthenticatedCheckInRoute,
   AuthenticatedCompanionRoute: AuthenticatedCompanionRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedJournalRoute: AuthenticatedJournalRoute,
+  AuthenticatedJournalRoute: AuthenticatedJournalRouteWithChildren,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
 }
 
