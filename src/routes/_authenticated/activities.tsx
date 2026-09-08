@@ -109,19 +109,6 @@ function BreathingExercise({ onComplete }: { onComplete: (seconds: number) => vo
     elapsed.current = 0;
   }
 
-  return () => window.clearInterval(timer);
-  }, [running, phase]);
-
-  const current = PHASES[phase]!;
-
-  function reset() {
-    setRunning(false);
-    setPhase(0);
-    setRemaining(PHASES[0].seconds);
-    setCycles(0);
-    elapsed.current = 0;
-  }
-
   return (
     <div className="rounded-3xl border border-border/70 bg-card/70 p-6 text-center">
       <h2 className="text-lg">Breathing exercise</h2>
