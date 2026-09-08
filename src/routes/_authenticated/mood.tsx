@@ -54,7 +54,7 @@ function MoodPage() {
   const month = withinDays(checkIns, 30);
   const distribution = moodDistribution(month);
   const top = distribution[0];
-  const avg = (list: typeof checkIns) =>
+  const avg = (list: { mood_score: number }[]) =>
     list.length ? list.reduce((s, c) => s + c.mood_score, 0) / list.length : 0;
   const trend = week.length && month.length > week.length ? avg(week) - avg(month) : 0;
 

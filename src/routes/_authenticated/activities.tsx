@@ -79,8 +79,8 @@ const PHASES = [
 
 function BreathingExercise({ onComplete }: { onComplete: (seconds: number) => void }) {
   const [running, setRunning] = useState(false);
-  const [phase, setPhase] = useState(0);
-  const [remaining, setRemaining] = useState(PHASES[0].seconds);
+  const [phase, setPhase] = useState<number>(0);
+  const [remaining, setRemaining] = useState<number>(PHASES[0].seconds);
   const [cycles, setCycles] = useState(0);
   const elapsed = useRef(0);
 
@@ -90,16 +90,26 @@ function BreathingExercise({ onComplete }: { onComplete: (seconds: number) => vo
       elapsed.current += 1;
       setRemaining((value) => {
         if (value > 1) return value - 1;
-        setPhase((current) => {
-          const next = (current + 1) % PHASES.length;
-          if (next === 0) setCycles((c) => c + 1);
-          setRemaining(PHASES[next]!.seconds);
-          return next;
-        });
-        return PHASES[(phase + 1) % PHASES.length]!.seconds;
+        const next = (phase + 1) % PHASES.length;
+        setPhase(next);
+        if (next === 0) setCycles((c) => c + 1);
+        return PHASES[next]!.seconds;
       });
     }, 1000);
     return () => window.clearInterval(timer);
+  }, [running, phase]);
+
+  const current = PHASES[phase]!;
+
+  function reset() {
+    setRunning(false);
+    setPhase(0);
+    setRemaining(PHASES[0].seconds);
+    setCycles(0);
+    elapsed.current = 0;
+  }
+
+  return () => window.clearInterval(timer);
   }, [running, phase]);
 
   const current = PHASES[phase]!;
