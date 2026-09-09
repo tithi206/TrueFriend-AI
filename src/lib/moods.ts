@@ -8,13 +8,13 @@ export type Mood = {
 /** The eight moods a person can pick during a check-in. */
 export const MOODS: Mood[] = [
   { label: "Happy", emoji: "😊", score: 5, color: "var(--chart-2)" },
-  { label: "Calm", emoji: "🌿", score: 5, color: "var(--chart-1)" },
+  { label: "Calm", emoji: "😌", score: 5, color: "var(--chart-1)" },
   { label: "Okay", emoji: "⛅", score: 3, color: "var(--chart-3)" },
   { label: "Tired", emoji: "😴", score: 3, color: "var(--chart-4)" },
-  { label: "Anxious", emoji: "😰", score: 2, color: "var(--chart-5)" },
-  { label: "Stressed", emoji: "🌪️", score: 2, color: "var(--chart-5)" },
-  { label: "Sad", emoji: "🌧️", score: 2, color: "var(--chart-3)" },
-  { label: "Angry", emoji: "🔥", score: 1, color: "var(--destructive)" },
+  { label: "Anxious", emoji: "😟", score: 2, color: "var(--chart-5)" },
+  { label: "Stressed", emoji: "😣", score: 2, color: "var(--chart-5)" },
+  { label: "Sad", emoji: "😢", score: 2, color: "var(--chart-3)" },
+  { label: "Angry", emoji: "😠", score: 1, color: "var(--destructive)" },
 ];
 
 export const MOOD_LABELS = MOODS.map((m) => m.label);
