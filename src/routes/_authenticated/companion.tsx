@@ -79,13 +79,15 @@ function CompanionPage() {
   const mutation = useMutation({
     mutationFn: (content: string) => send({ data: { conversationId: activeId, content } }),
     onSuccess: async (result) => {
-      setPending(null);
       setActiveId(result.conversationId);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["conversations"] }),
         queryClient.invalidateQueries({ queryKey: ["messages", result.conversationId] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
       ]);
+      setPending(null);
     },
+
     onError: (error) => {
       setPending(null);
       toast.error(error instanceof Error ? error.message : "Message didn't send.");
