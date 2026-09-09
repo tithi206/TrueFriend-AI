@@ -67,7 +67,9 @@ function CheckInPage() {
       setSelected(null);
       setNote("");
       toast.success("Check-in saved.");
-      queryClient.invalidateQueries({ queryKey: ["check-ins"] });
+      for (const key of [["check-ins"], ["dashboard"], ["mood-analytics"], ["insights"], ["progress"]]) {
+        queryClient.invalidateQueries({ queryKey: key });
+      }
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Couldn't save."),
   });
