@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { MOODS, moodEmoji } from "@/lib/moods";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/check-in")({
@@ -29,17 +30,10 @@ export const Route = createFileRoute("/_authenticated/check-in")({
   component: CheckInPage,
 });
 
-const MOODS = [
-  { score: 1, label: "Struggling", emoji: "🌧️" },
-  { score: 2, label: "Low", emoji: "🌥️" },
-  { score: 3, label: "Okay", emoji: "⛅" },
-  { score: 4, label: "Good", emoji: "🌤️" },
-  { score: 5, label: "Peaceful", emoji: "☀️" },
-];
 
 function CheckInPage() {
   const queryClient = useQueryClient();
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
   const checkIns = useQuery({
@@ -57,7 +51,7 @@ function CheckInPage() {
 
   const save = useMutation({
     mutationFn: async () => {
-      const mood = MOODS.find((m) => m.score === selected);
+      const mood = MOODS.find((m) => m.label === selected);
       if (!mood) throw new Error("Pick how you're feeling first.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Please sign in again.");
@@ -95,11 +89,11 @@ function CheckInPage() {
         <div className="flex flex-wrap gap-2">
           {MOODS.map((mood) => (
             <button
-              key={mood.score}
-              onClick={() => setSelected(mood.score)}
+              key={mood.label}
+              onClick={() => setSelected(mood.label)}
               className={cn(
                 "flex flex-1 min-w-24 flex-col items-center gap-1 rounded-2xl border px-3 py-3 text-sm transition-colors",
-                selected === mood.score
+                selected === mood.label
                   ? "border-primary bg-secondary text-foreground"
                   : "border-border bg-background text-muted-foreground hover:border-primary/40",
               )}
@@ -137,7 +131,7 @@ function CheckInPage() {
           <li key={entry.id} className="rounded-2xl border border-border/70 bg-card/60 p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">
-                {MOODS.find((m) => m.score === entry.mood_score)?.emoji} {entry.mood_label}
+                {moodEmoji(entry.mood_label)} {entry.mood_label}
               </span>
               <time className="text-muted-foreground" dateTime={entry.created_at}>
                 {new Date(entry.created_at).toLocaleString(undefined, {
