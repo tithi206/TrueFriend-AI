@@ -161,7 +161,7 @@ function CompanionPage() {
           ) : (
             <>
               {shown.map((m) => (
-                <Bubble key={m.id} role={m.role} content={m.content} />
+                <Bubble key={m.id} role={m.role} content={m.content} at={m.created_at} />
               ))}
               {pending && <Bubble role="user" content={pending} />}
               {mutation.isPending && (
@@ -205,10 +205,10 @@ function CompanionPage() {
   );
 }
 
-function Bubble({ role, content }: { role: string; content: string }) {
+function Bubble({ role, content, at }: { role: string; content: string; at?: string }) {
   const isUser = role === "user";
   return (
-    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+    <div className={cn("flex flex-col gap-1", isUser ? "items-end" : "items-start")}>
       <div
         className={cn(
           "max-w-[85%] whitespace-pre-wrap rounded-3xl px-4 py-3 text-sm leading-relaxed",
@@ -219,6 +219,11 @@ function Bubble({ role, content }: { role: string; content: string }) {
       >
         {content}
       </div>
+      {at && (
+        <time className="px-2 text-[11px] text-muted-foreground" dateTime={at}>
+          {new Date(at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+        </time>
+      )}
     </div>
   );
 }
