@@ -42,13 +42,15 @@ const SAFETY_NOTE = `SAFETY: This message may indicate the person is in danger o
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
-export async function completeChat(turns: ChatTurn[], moodContext?: string) {
+export async function completeChat(turns: ChatTurn[], moodContext?: string, style?: string) {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("AI is not configured yet.");
 
   const lastUser = [...turns].reverse().find((t) => t.role === "user")?.content ?? "";
 
   let system = SYSTEM_PROMPT;
+  const styleNote = STYLE_NOTES[style ?? "friend"] ?? STYLE_NOTES["friend"];
+  system += `\n\n${styleNote}`;
   if (moodContext) {
     system += `\n\nRecent check-in context (do not recite it verbatim): ${moodContext}`;
   }
