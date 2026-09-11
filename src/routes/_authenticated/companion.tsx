@@ -10,7 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { sendMessage } from "@/lib/companion.functions";
+import { CHAT_STYLES, DEFAULT_CHAT_STYLE, findChatStyle, type ChatStyleId } from "@/lib/chat-styles";
 import { cn } from "@/lib/utils";
+
+const STYLE_KEY = "peace-chat-style";
 
 export const Route = createFileRoute("/_authenticated/companion")({
   head: () => ({
