@@ -134,6 +134,31 @@ function CompanionPage() {
         >
           <Plus className="size-4" /> New conversation
         </Button>
+
+        <div className="mt-4 rounded-2xl border border-border/70 bg-card/60 p-3">
+          <p className="px-1 text-xs font-medium text-muted-foreground">Chat style</p>
+          <div className="mt-2 space-y-1">
+            {CHAT_STYLES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => chooseStyle(s.id)}
+                aria-pressed={style === s.id}
+                className={cn(
+                  "w-full rounded-xl px-2.5 py-2 text-left text-sm transition-colors",
+                  style === s.id
+                    ? "bg-primary/10 text-foreground"
+                    : "text-muted-foreground hover:bg-secondary/60",
+                )}
+              >
+                <span className="mr-1.5">{s.emoji}</span>
+                {s.label}
+                <span className="block pl-6 text-[11px] text-muted-foreground/80">{s.hint}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <ScrollArea className="mt-3 max-h-[60vh]">
           <ul className="space-y-1 pr-2">
             {(conversations.data ?? []).map((c) => (
