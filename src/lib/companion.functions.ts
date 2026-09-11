@@ -59,6 +59,7 @@ export const sendMessage = createServerFn({ method: "POST" })
     const reply = await completeChat(
       (history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
       moodContext,
+      data.style,
     );
 
     const { error: replyError } = await supabase.from("messages").insert({
