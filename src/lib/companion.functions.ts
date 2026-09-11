@@ -11,6 +11,7 @@ export const sendMessage = createServerFn({ method: "POST" })
       .object({
         conversationId: z.string().uuid().nullable().optional(),
         content: z.string().min(1).max(4000),
+        style: z.enum(["friend", "listener", "motivator", "practical"]).optional(),
       })
       .parse(data),
   )
