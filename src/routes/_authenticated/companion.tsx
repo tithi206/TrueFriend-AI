@@ -51,7 +51,19 @@ function CompanionPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
+  const [style, setStyle] = useState<ChatStyleId>(DEFAULT_CHAT_STYLE);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STYLE_KEY);
+    if (saved && CHAT_STYLES.some((s) => s.id === saved)) setStyle(saved as ChatStyleId);
+  }, []);
+
+  function chooseStyle(id: ChatStyleId) {
+    setStyle(id);
+    localStorage.setItem(STYLE_KEY, id);
+    toast.success(`Chat style: ${findChatStyle(id).label}`);
+  }
 
   const conversations = useQuery({
     queryKey: ["conversations"],
