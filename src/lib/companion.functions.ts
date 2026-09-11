@@ -11,6 +11,7 @@ export const sendMessage = createServerFn({ method: "POST" })
       .object({
         conversationId: z.string().uuid().nullable().optional(),
         content: z.string().min(1).max(4000),
+        style: z.enum(["friend", "listener", "motivator", "practical"]).optional(),
       })
       .parse(data),
   )
@@ -58,6 +59,7 @@ export const sendMessage = createServerFn({ method: "POST" })
     const reply = await completeChat(
       (history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
       moodContext,
+      data.style,
     );
 
     const { error: replyError } = await supabase.from("messages").insert({

@@ -10,7 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { sendMessage } from "@/lib/companion.functions";
+import { CHAT_STYLES, DEFAULT_CHAT_STYLE, findChatStyle, type ChatStyleId } from "@/lib/chat-styles";
 import { cn } from "@/lib/utils";
+
+const STYLE_KEY = "peace-chat-style";
 
 export const Route = createFileRoute("/_authenticated/companion")({
   head: () => ({
@@ -48,7 +51,19 @@ function CompanionPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
+  const [style, setStyle] = useState<ChatStyleId>(DEFAULT_CHAT_STYLE);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STYLE_KEY);
+    if (saved && CHAT_STYLES.some((s) => s.id === saved)) setStyle(saved as ChatStyleId);
+  }, []);
+
+  function chooseStyle(id: ChatStyleId) {
+    setStyle(id);
+    localStorage.setItem(STYLE_KEY, id);
+    toast.success(`Chat style: ${findChatStyle(id).label}`);
+  }
 
   const conversations = useQuery({
     queryKey: ["conversations"],
@@ -77,7 +92,7 @@ function CompanionPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (content: string) => send({ data: { conversationId: activeId, content } }),
+    mutationFn: (content: string) => send({ data: { conversationId: activeId, content, style } }),
     onSuccess: async (result) => {
       setActiveId(result.conversationId);
       await Promise.all([
@@ -119,6 +134,31 @@ function CompanionPage() {
         >
           <Plus className="size-4" /> New conversation
         </Button>
+
+        <div className="mt-4 rounded-2xl border border-border/70 bg-card/60 p-3">
+          <p className="px-1 text-xs font-medium text-muted-foreground">Chat style</p>
+          <div className="mt-2 space-y-1">
+            {CHAT_STYLES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => chooseStyle(s.id)}
+                aria-pressed={style === s.id}
+                className={cn(
+                  "w-full rounded-xl px-2.5 py-2 text-left text-sm transition-colors",
+                  style === s.id
+                    ? "bg-primary/10 text-foreground"
+                    : "text-muted-foreground hover:bg-secondary/60",
+                )}
+              >
+                <span className="mr-1.5">{s.emoji}</span>
+                {s.label}
+                <span className="block pl-6 text-[11px] text-muted-foreground/80">{s.hint}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <ScrollArea className="mt-3 max-h-[60vh]">
           <ul className="space-y-1 pr-2">
             {(conversations.data ?? []).map((c) => (
