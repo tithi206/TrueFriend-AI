@@ -92,7 +92,7 @@ function CompanionPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (content: string) => send({ data: { conversationId: activeId, content } }),
+    mutationFn: (content: string) => send({ data: { conversationId: activeId, content, style } }),
     onSuccess: async (result) => {
       setActiveId(result.conversationId);
       await Promise.all([
