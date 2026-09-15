@@ -19,6 +19,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
+import { Route as AuthenticatedProductivityRouteImport } from './routes/_authenticated/productivity'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedJournalEntryIdRouteImport } from './routes/_authenticated/journal.$entryId'
@@ -72,6 +73,12 @@ const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
   path: '/mood',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProductivityRoute =
+  AuthenticatedProductivityRouteImport.update({
+    id: '/productivity',
+    path: '/productivity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/insights': typeof AuthenticatedInsightsRoute
   '/journal': typeof AuthenticatedJournalRouteWithChildren
   '/mood': typeof AuthenticatedMoodRoute
+  '/productivity': typeof AuthenticatedProductivityRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
   '/insights': typeof AuthenticatedInsightsRoute
   '/journal': typeof AuthenticatedJournalRouteWithChildren
   '/mood': typeof AuthenticatedMoodRoute
+  '/productivity': typeof AuthenticatedProductivityRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -129,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRouteWithChildren
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
+  '/_authenticated/productivity': typeof AuthenticatedProductivityRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/journal'
     | '/mood'
+    | '/productivity'
     | '/profile'
     | '/progress'
     | '/journal/$entryId'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/journal'
     | '/mood'
+    | '/productivity'
     | '/profile'
     | '/progress'
     | '/journal/$entryId'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/insights'
     | '/_authenticated/journal'
     | '/_authenticated/mood'
+    | '/_authenticated/productivity'
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/journal/$entryId'
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoodRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/productivity': {
+      id: '/_authenticated/productivity'
+      path: '/productivity'
+      fullPath: '/productivity'
+      preLoaderRoute: typeof AuthenticatedProductivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -300,6 +320,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRouteWithChildren
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
+  AuthenticatedProductivityRoute: typeof AuthenticatedProductivityRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
 }
@@ -312,6 +333,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRouteWithChildren,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
+  AuthenticatedProductivityRoute: AuthenticatedProductivityRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
 }
