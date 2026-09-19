@@ -158,6 +158,9 @@ export function buildSuggestions(tasks: Task[]) {
   }
   if (!open.length && tasks.length) out.push("Your list is clear. Enjoy the quiet 🌿");
   if (!tasks.length) out.push("Add your first task and I'll help you decide what to do next.");
+  if (out.length === 0 && open.length) {
+    out.push("Pick one task and give it 15 focused minutes — that's plenty for today 🌿");
+  }
   return out.slice(0, 4);
 }
 
