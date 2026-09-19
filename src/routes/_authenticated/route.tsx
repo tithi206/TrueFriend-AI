@@ -37,13 +37,14 @@ const NAV = [
   { to: "/mood", label: "Mood", icon: Heart },
   { to: "/journal", label: "Journal", icon: BookOpen },
   { to: "/activities", label: "Activities", icon: Sparkles },
+  { to: "/productivity", label: "Productivity", icon: ListTodo },
   { to: "/progress", label: "Progress", icon: TrendingUp },
   { to: "/insights", label: "Insights", icon: Lightbulb },
   { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
 const MOBILE_NAV = NAV.filter((item) =>
-  ["/dashboard", "/companion", "/mood", "/journal", "/activities"].includes(item.to),
+  ["/dashboard", "/companion", "/mood", "/journal", "/productivity"].includes(item.to),
 );
 
 function AuthenticatedLayout() {
