@@ -6,6 +6,7 @@ import {
   Heart,
   LayoutDashboard,
   Lightbulb,
+  ListTodo,
   MessageCircle,
   Moon,
   Sparkles,
