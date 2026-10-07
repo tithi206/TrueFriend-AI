@@ -408,6 +408,50 @@ function ProductivityPage() {
         </div>
       </div>
 
+      {user && (
+        <section className="mt-5 rounded-3xl border border-border/70 bg-card/70 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex gap-3">
+              <BellRing className="mt-0.5 size-5 shrink-0 text-primary" />
+              <div>
+                <h2 className="text-base font-medium">Browser reminders</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Private to your account on this device. Reminder checks run while Productivity is open.
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={reminderOwnerId === user.id && reminders.enabled}
+              onCheckedChange={() => void toggleReminders()}
+              aria-label="Enable browser reminders"
+              disabled={reminderOwnerId !== user.id || notificationPermission === "unsupported"}
+            />
+          </div>
+          {notificationPermission === "denied" && (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Notifications are blocked by your browser. Allow them in browser settings to turn reminders on.
+            </p>
+          )}
+          <div className="mt-4 grid gap-3 border-t border-border/60 pt-4 sm:grid-cols-3">
+            {([
+              ["upcoming", "Due today or tomorrow"],
+              ["overdue", "Overdue tasks"],
+              ["highPriority", "High-priority tasks"],
+            ] as const).map(([key, label]) => (
+              <label key={key} className="flex items-center justify-between gap-3 text-sm">
+                <span>{label}</span>
+                <Switch
+                  checked={reminders[key]}
+                  disabled={!reminders.enabled || reminderOwnerId !== user.id}
+                  onCheckedChange={(checked) => saveReminderPreferences({ ...reminders, [key]: checked })}
+                  aria-label={`Remind me about ${label.toLowerCase()}`}
+                />
+              </label>
+            ))}
+          </div>
+        </section>
+      )}
+
       {tasksQuery.isLoading ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           {[0, 1, 2, 3, 4, 5].map((i) => (
