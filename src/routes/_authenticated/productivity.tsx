@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -13,13 +13,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { CalendarDays, Check, Clock, Pencil, Plus, Search, Sparkles, Trash2, X } from "lucide-react";
+import { BellRing, CalendarDays, Check, Clock, Pencil, Plus, Search, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   buildSuggestions,
@@ -64,6 +66,23 @@ export const Route = createFileRoute("/_authenticated/productivity")({
 
 type Filter = "today" | "upcoming" | "completed" | "all";
 type SortBy = "priority" | "due";
+type ReminderPreferences = {
+  enabled: boolean;
+  upcoming: boolean;
+  overdue: boolean;
+  highPriority: boolean;
+};
+
+const DEFAULT_REMINDERS: ReminderPreferences = {
+  enabled: false,
+  upcoming: true,
+  overdue: true,
+  highPriority: true,
+};
+
+function localDayKey(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
 
 const emptyDraft = {
   title: "",
@@ -75,6 +94,7 @@ const emptyDraft = {
 };
 
 function ProductivityPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<Filter>("today");
   const [sortBy, setSortBy] = useState<SortBy>("priority");
@@ -83,6 +103,9 @@ function ProductivityPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState(emptyDraft);
   const [showPlan, setShowPlan] = useState(false);
+  const [reminders, setReminders] = useState<ReminderPreferences>(DEFAULT_REMINDERS);
+  const [reminderOwnerId, setReminderOwnerId] = useState<string | null>(null);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | "unsupported">("unsupported");
 
   const tasksQuery = useQuery({
     queryKey: ["tasks"],
@@ -113,6 +136,113 @@ function ProductivityPage() {
   });
 
   const tasks = useMemo(() => tasksQuery.data ?? [], [tasksQuery.data]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setReminderOwnerId(null);
+      setReminders(DEFAULT_REMINDERS);
+      return;
+    }
+    const key = `peace-task-reminders:${user.id}`;
+    try {
+      const stored = window.localStorage.getItem(key);
+      const parsed = stored ? JSON.parse(stored) as Partial<ReminderPreferences> : {};
+      setReminders({
+        enabled: parsed.enabled === true,
+        upcoming: parsed.upcoming !== false,
+        overdue: parsed.overdue !== false,
+        highPriority: parsed.highPriority !== false,
+      });
+    } catch {
+      setReminders(DEFAULT_REMINDERS);
+    }
+    setReminderOwnerId(user.id);
+    setNotificationPermission("Notification" in window ? window.Notification.permission : "unsupported");
+  }, [user?.id]);
+
+  function saveReminderPreferences(next: ReminderPreferences) {
+    setReminders(next);
+    if (!user?.id) return;
+    try {
+      window.localStorage.setItem(`peace-task-reminders:${user.id}`, JSON.stringify(next));
+    } catch {
+      toast.error("Reminder settings couldn't be saved on this device.");
+    }
+  }
+
+  async function toggleReminders() {
+    if (reminders.enabled) {
+      saveReminderPreferences({ ...reminders, enabled: false });
+      return;
+    }
+    if (!("Notification" in window)) {
+      setNotificationPermission("unsupported");
+      toast.error("Browser notifications aren't available here.");
+      return;
+    }
+    const permission = window.Notification.permission === "default"
+      ? await window.Notification.requestPermission()
+      : window.Notification.permission;
+    setNotificationPermission(permission);
+    if (permission === "granted") {
+      saveReminderPreferences({ ...reminders, enabled: true });
+    } else if (permission === "denied") {
+      toast.error("Notifications are blocked in your browser settings.");
+    }
+  }
+
+  useEffect(() => {
+    if (!user?.id || reminderOwnerId !== user.id || !reminders.enabled || notificationPermission !== "granted") return;
+    const checkReminders = () => {
+      if (window.Notification.permission !== "granted") return;
+      const today = todayKey();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowKey = localDayKey(tomorrow);
+      const open = tasks.filter((task) => !task.completed_at);
+      const categories = [
+        { id: "upcoming", active: reminders.upcoming && open.some((task) => task.due_date === today || task.due_date === tomorrowKey), body: "A task is due today or tomorrow. Open Productivity to review your list." },
+        { id: "overdue", active: reminders.overdue && open.some(isOverdue), body: "You have an overdue task. Open Productivity when you're ready to review it." },
+        { id: "high-priority", active: reminders.highPriority && open.some((task) => task.priority === "high"), body: "You have a high-priority task waiting. Open Productivity to take a look." },
+      ];
+      const sentKey = `peace-task-reminders-sent:${user.id}`;
+      let sent: Record<string, string> = {};
+      try {
+        const stored = window.localStorage.getItem(sentKey);
+        sent = stored ? JSON.parse(stored) as Record<string, string> : {};
+      } catch {
+        sent = {};
+      }
+      let changed = false;
+      for (const category of categories) {
+        if (!category.active || sent[category.id] === today) continue;
+        try {
+          const notification = new window.Notification("Peace Companion", {
+            body: category.body,
+            tag: `peace-task-reminder-${category.id}`,
+          });
+          notification.onclick = () => {
+            window.focus();
+            notification.close();
+          };
+          sent[category.id] = today;
+          changed = true;
+        } catch {
+          // Notification permission can change while the page is open.
+        }
+      }
+      if (changed) {
+        try {
+          window.localStorage.setItem(sentKey, JSON.stringify(sent));
+        } catch {
+          // Reminders remain usable if this device cannot persist notification history.
+        }
+      }
+    };
+    checkReminders();
+    const timer = window.setInterval(checkReminders, 60_000);
+    return () => window.clearInterval(timer);
+  }, [tasks, user?.id, reminderOwnerId, reminders, notificationPermission]);
 
   function refresh() {
     queryClient.invalidateQueries({ queryKey: ["tasks"] });
