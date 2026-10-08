@@ -111,13 +111,42 @@ function AuthPage() {
           ← Peace Companion
         </Link>
         <div className="rounded-3xl border border-border/70 bg-card p-7 shadow-sm">
-          <h1 className="text-2xl">{isSignUp ? "Create your space" : "Welcome back"}</h1>
+          <h1 className="text-2xl">
+            {forgotMode ? "Reset your password" : isSignUp ? "Create your space" : "Welcome back"}
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {isSignUp
-              ? "Your conversations and check-ins stay private to you."
-              : "Pick up right where you left off."}
+            {forgotMode
+              ? "Enter your email and we'll send you a reset link."
+              : isSignUp
+                ? "Your conversations and check-ins stay private to you."
+                : "Pick up right where you left off."}
           </p>
 
+          {forgotMode ? (
+            <form onSubmit={handleResetRequest} className="mt-6 space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="resetEmail">Email</Label>
+                <Input
+                  id="resetEmail"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </div>
+              <Button type="submit" className="w-full rounded-full" disabled={busy}>
+                {busy ? "One moment…" : "Send reset link"}
+              </Button>
+              <button
+                type="button"
+                onClick={() => setForgotMode(false)}
+                className="w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+              >
+                Back to sign in
+              </button>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             {isSignUp && (
               <div className="space-y-1.5">
