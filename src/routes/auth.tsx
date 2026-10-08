@@ -38,6 +38,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [forgotMode, setForgotMode] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -74,6 +75,23 @@ function AuthPage() {
     }
   }
 
+  async function handleResetRequest(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Reset link sent — check your email.");
+      setForgotMode(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleGoogle() {
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
@@ -93,13 +111,42 @@ function AuthPage() {
           ← Peace Companion
         </Link>
         <div className="rounded-3xl border border-border/70 bg-card p-7 shadow-sm">
-          <h1 className="text-2xl">{isSignUp ? "Create your space" : "Welcome back"}</h1>
+          <h1 className="text-2xl">
+            {forgotMode ? "Reset your password" : isSignUp ? "Create your space" : "Welcome back"}
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {isSignUp
-              ? "Your conversations and check-ins stay private to you."
-              : "Pick up right where you left off."}
+            {forgotMode
+              ? "Enter your email and we'll send you a reset link."
+              : isSignUp
+                ? "Your conversations and check-ins stay private to you."
+                : "Pick up right where you left off."}
           </p>
 
+          {forgotMode ? (
+            <form onSubmit={handleResetRequest} className="mt-6 space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="resetEmail">Email</Label>
+                <Input
+                  id="resetEmail"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </div>
+              <Button type="submit" className="w-full rounded-full" disabled={busy}>
+                {busy ? "One moment…" : "Send reset link"}
+              </Button>
+              <button
+                type="button"
+                onClick={() => setForgotMode(false)}
+                className="w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+              >
+                Back to sign in
+              </button>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             {isSignUp && (
               <div className="space-y-1.5">
@@ -136,10 +183,20 @@ function AuthPage() {
                 autoComplete={isSignUp ? "new-password" : "current-password"}
               />
             </div>
+            {!isSignUp && (
+              <button
+                type="button"
+                onClick={() => setForgotMode(true)}
+                className="w-full text-right text-xs text-muted-foreground underline-offset-4 hover:underline"
+              >
+                Forgot password?
+              </button>
+            )}
             <Button type="submit" className="w-full rounded-full" disabled={busy}>
               {busy ? "One moment…" : isSignUp ? "Create account" : "Sign in"}
             </Button>
           </form>
+          )}
 
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="h-px flex-1 bg-border" />
