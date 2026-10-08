@@ -55,7 +55,6 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
             data: { display_name: displayName || email.split("@")[0] },
           },
         });
@@ -67,7 +66,7 @@ function AuthPage() {
       }
       const { data } = await supabase.auth.getSession();
       if (data.session) navigate({ to: "/dashboard" });
-      else toast.info("Check your inbox to confirm your email, then sign in.");
+      else toast.info("Your account is ready. You can sign in with your email and password.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong.");
     } finally {
