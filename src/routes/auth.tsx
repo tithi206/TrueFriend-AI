@@ -183,10 +183,20 @@ function AuthPage() {
                 autoComplete={isSignUp ? "new-password" : "current-password"}
               />
             </div>
+            {!isSignUp && (
+              <button
+                type="button"
+                onClick={() => setForgotMode(true)}
+                className="w-full text-right text-xs text-muted-foreground underline-offset-4 hover:underline"
+              >
+                Forgot password?
+              </button>
+            )}
             <Button type="submit" className="w-full rounded-full" disabled={busy}>
               {busy ? "One moment…" : isSignUp ? "Create account" : "Sign in"}
             </Button>
           </form>
+          )}
 
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="h-px flex-1 bg-border" />
