@@ -1,12 +1,118 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { Check, Pause, Play, RotateCcw } from "lucide-react";
+import { Check, ListMusic, Music2, Pause, Play, Plus, RotateCcw, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+
+type MusicPlaylist = { id: string; userId: string; name: string };
+type MusicTrack = {
+  id: string;
+  userId: string;
+  playlistId: string;
+  title: string;
+  audio: Blob;
+};
+
+function openMusicDatabase(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open("peace-companion-music", 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains("playlists")) {
+        database.createObjectStore("playlists", { keyPath: "id" });
+      }
+      if (!database.objectStoreNames.contains("tracks")) {
+        database.createObjectStore("tracks", { keyPath: "id" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error ?? new Error("Music library couldn't be opened."));
+  });
+}
+
+async function readMusicLibrary(userId: string) {
+  const database = await openMusicDatabase();
+  return new Promise<{ playlists: MusicPlaylist[]; tracks: MusicTrack[] }>((resolve, reject) => {
+    const transaction = database.transaction(["playlists", "tracks"], "readonly");
+    const playlistsRequest = transaction.objectStore("playlists").getAll();
+    const tracksRequest = transaction.objectStore("tracks").getAll();
+    let playlists: MusicPlaylist[] = [];
+    let tracks: MusicTrack[] = [];
+    playlistsRequest.onsuccess = () => {
+      playlists = (playlistsRequest.result as MusicPlaylist[]).filter((item) => item.userId === userId);
+    };
+    tracksRequest.onsuccess = () => {
+      tracks = (tracksRequest.result as MusicTrack[]).filter((item) => item.userId === userId);
+    };
+    transaction.oncomplete = () => {
+      database.close();
+      resolve({ playlists, tracks });
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error ?? new Error("Music library couldn't be loaded."));
+    };
+  });
+}
+
+async function saveMusicRecord(store: "playlists" | "tracks", record: MusicPlaylist | MusicTrack) {
+  const database = await openMusicDatabase();
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction(store, "readwrite");
+    transaction.objectStore(store).put(record);
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error ?? new Error("Your music couldn't be saved on this device."));
+    };
+  });
+}
+
+async function removeMusicTrack(id: string) {
+  const database = await openMusicDatabase();
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction("tracks", "readwrite");
+    transaction.objectStore("tracks").delete(id);
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error ?? new Error("Track couldn't be removed."));
+    };
+  });
+}
+
+async function removeMusicPlaylist(playlistId: string) {
+  const database = await openMusicDatabase();
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction(["playlists", "tracks"], "readwrite");
+    transaction.objectStore("playlists").delete(playlistId);
+    const tracksStore = transaction.objectStore("tracks");
+    const request = tracksStore.getAll();
+    request.onsuccess = () => {
+      (request.result as MusicTrack[])
+        .filter((track) => track.playlistId === playlistId)
+        .forEach((track) => tracksStore.delete(track.id));
+    };
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error ?? new Error("Playlist couldn't be removed."));
+    };
+  });
+}
 
 export const Route = createFileRoute("/_authenticated/activities")({
   head: () => ({
