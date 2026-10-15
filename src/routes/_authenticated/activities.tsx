@@ -5,6 +5,8 @@ import { Check, ListMusic, Music2, Pause, Play, Plus, RotateCcw, Trash2, Upload,
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
