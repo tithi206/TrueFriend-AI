@@ -371,6 +371,10 @@ function MusicLibrary() {
 
   useEffect(() => {
     let cancelled = false;
+    audioRef.current?.pause();
+    audioRef.current?.removeAttribute("src");
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    objectUrlRef.current = null;
     setLoading(true);
     setPlaylists([]);
     setTracks([]);
